@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatefulWidget {
@@ -81,5 +82,28 @@ class _LoginPageState extends State<LoginPage> {
   //
   // LOGIN com o Firebase Auth
   //
-  void login(email, senha) {}
+  void login(email, senha) {
+    FirebaseAuth.instance
+        .signInWithEmailAndPassword(email: email, password: senha)
+        .then((value) {
+      Navigator.pushReplacementNamed(context, '/principal');
+    }).catchError((erro) {
+      if (erro.code == 'user-not-found') {
+        exibirMensagem('ERRO: Usuário não encontrado.');
+      } else if (erro.code == 'wrong-password') {
+        exibirMensagem('ERRO: Senha incorreta.');
+      } else {
+        exibirMensagem('ERRO: ${erro.message}.');
+      }
+    });
+  }
+
+  void exibirMensagem(msg) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(msg),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
 }
